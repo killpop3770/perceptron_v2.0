@@ -24,9 +24,22 @@ func sigmoid(v mat.Matrix) *mat.Dense {
 			matrixForExp.Set(i,j,cellAfterExp)
 		}
 	}
-
 	return matrixForExp
 }
+
+func multMatrixCell(v1 mat.Matrix, v2 mat.Matrix) *mat.Dense {
+	rows1, cols1 := v1.Dims()
+	matrixForMult := mat.NewDense(rows1, cols1, nil)
+
+	for i:=0; i<rows1; i++{
+		for j:=0; j<cols1; j++{
+			cellAfterMult := v1.At(i,j)*v2.At(i,j)
+			matrixForMult.Set(i,j,cellAfterMult)
+		}
+	}
+	return matrixForMult
+}
+
 func main() {
 	//Входные данные
 	trainingInputs := mat.NewDense(5, 3, []float64{0,0,1,1,1,1,1,0,1,0,1,1,0,1,0})
@@ -62,12 +75,11 @@ func main() {
 
 	//Тренировка "нейросети"
 	////Количество итераций для тренировки
-	circles := 5000
+	circles := 1000
 	outputs := mat.NewDense(5, 1, nil) //Пустая матрица
 
 	for i := 0; i<circles; i++ {
 		inputData := trainingInputs
-
 
 		////Перемножение матриц
 		outputs.Product(inputData, synapticWeights)
@@ -108,13 +120,16 @@ func main() {
 		//matPrint(tempOutputs)
 		//println()
 
-		temp1 := mat.NewDense(5, 5, nil)
-		temp1.Product(tempOutputs, outputs.T())
-		//println("Temp2:")
+		temp1 := mat.NewDense(5, 1, nil)
+		temp1 = multMatrixCell(tempOutputs, outputs)
+		//temp1.Product(tempOutputs, outputs)
+		//println("Temp1:")
 		//matPrint(temp1)
 		//println()
+
 		temp2 := mat.NewDense(5,1,nil)
-		temp2.Product(temp1, err)
+		temp2 = multMatrixCell(temp1, err)
+		//temp2.Product(temp1, err)
 		//println("Temp2:")
 		//matPrint(temp2)
 		//println()
